@@ -3,10 +3,12 @@
 
 This is a Burp plugin to parse Content-Security-Policy headers and detect
 weaknesses and possibly bypasses in the policy.
+
+UnregisteredDomains added by @t
 """
 # pylint: disable=E0602,C0103,W0621,R0903,R0201
 
-
+from socket import getaddrinfo
 from httplib import HTTPResponse
 from StringIO import StringIO
 from urlparse import urlparse
@@ -304,6 +306,26 @@ class ContentSecurityPolicyScan(IScannerCheck):
                     bypasses.append((domain, payload,))
         return bypasses
 
+    def UnregisteredDomain(self, csp, burpHttpReqResp):
+        """ Check if a domain can be resolved. If no, probably unregistered """
+        issues = []
+        for directive, sources in csp.iteritems():
+            if sources is None:
+                continue
+            for src in sources:
+                try:
+                    getaddrinfo(urlparse(src).netloc)
+                    unregisteredDomain = UnregisteredDomain(
+                        httpService=burpHttpReqResp.getHttpService(),
+                        url=self._getUrl(burpHttpReqResp),
+                        httpMessages=burpHttpReqResp,
+                        severity="High",
+                        confidence="Firm",
+                        directive=directive)
+                    issues.append(unregisteredDomain)
+                except:
+                    continue
+        return issues
 
 class BurpExtender(IBurpExtender):
 
