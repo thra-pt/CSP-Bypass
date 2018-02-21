@@ -54,6 +54,7 @@ class ContentSecurityPolicyScan(IScannerCheck):
             self.missingDirectiveCheck,
             self.weakDefaultSourceCheck,
             self.knownBypassCheck,
+            self.unregisteredDomainCheck,
         ]
 
     def _getUrl(self, burpHttpReqResp):
@@ -306,7 +307,7 @@ class ContentSecurityPolicyScan(IScannerCheck):
                     bypasses.append((domain, payload,))
         return bypasses
 
-    def UnregisteredDomain(self, csp, burpHttpReqResp):
+    def unregisteredDomainCheck(self, csp, burpHttpReqResp):
         """ Check if a domain can be resolved. If no, probably unregistered """
         issues = []
         for directive, sources in csp.iteritems():
