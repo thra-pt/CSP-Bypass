@@ -315,3 +315,16 @@ class KnownCSPBypass(BaseCSPIssue):
     def getRemediationDetail(self):
         return "Remove the content source '%s' domain from your '%s' CSP \
         directive." % (self._bypass[0], self._directive)
+
+class UnregisteredDomain(BaseCSPIssue):
+
+    """ Alerts the user of unregistered domains on the CSP """
+
+    def getIssueName(self):
+        return "Unregistered domain"
+
+    def getIssueDetail(self):
+        return "The CSP contains a domain that is not registered"
+
+    def getRemediationDetail(self):
+        return "Either remove the domain from CSP or register it"
